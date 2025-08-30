@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GQCountryAPI</string>
+    <string name="title_activity_country_detail">CountryDetailActivity</string>
+    <string name="title_activity_base_cactivity">BaseCActivity</string>
+</resources>

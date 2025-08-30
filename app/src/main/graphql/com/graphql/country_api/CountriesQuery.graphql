@@ -1,0 +1,24 @@
+query Countries {
+    countries {
+        continent {
+            name
+            code
+        }
+        languages{
+            name
+        }
+        name
+        capital
+        code
+        phone
+        currencies
+        emoji
+        native
+        states {
+            name
+            code
+        }
+    }
+}
+
+# todo: Generated Kotlin files will appear under: // build/generated/source/apollo/
