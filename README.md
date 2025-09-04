@@ -22,33 +22,21 @@ Asynchronous Ops: Coroutines & Flow
 
 **Architecture**
 The app follows MVVM Clean Architecture to ensure scalability, testability, and separation of concerns.
+com.example.countries
+│
+├── data
+│   ├── local (RoomDB)
+│   ├── remote (GraphQL API)
+│   └── repository
+│
+├── domain
+│   ├── model
+│   ├── repository
+│   └── usecase
+│
+├── presentation
+│   ├── ui (Jetpack Compose screens)
+│   └── viewmodel
+│
+└── di (Hilt Modules)
 
-Layers:
-
-Presentation Layer (UI)
-
-Built with Jetpack Compose.
-
-Uses ViewModel for UI state management.
-
-Observes data using Flow.
-
-Domain Layer
-
-Contains business logic.
-
-Defines use cases (interactors).
-
-Independent of frameworks.
-
-Data Layer
-
-Responsible for fetching and caching data.
-
-Contains repositories and data sources.
-
-Sources:
-
-Remote → GraphQL API.
-
-Local → RoomDB.
