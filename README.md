@@ -22,21 +22,6 @@ Asynchronous Ops: Coroutines & Flow
 
 **Architecture**
 The app follows MVVM Clean Architecture to ensure scalability, testability, and separation of concerns.
-com.example.countries
-│
-├── data
-│   ├── local (RoomDB)
-│   ├── remote (GraphQL API)
-│   └── repository
-│
-├── domain
-│   ├── model
-│   ├── repository
-│   └── usecase
-│
-├── presentation
-│   ├── ui (Jetpack Compose screens)
-│   └── viewmodel
-│
-└── di (Hilt Modules)
+<img width="478" height="533" alt="image" src="https://github.com/user-attachments/assets/4e365184-37e3-4c31-9fb4-02bd6ce086f1" />
+
 
