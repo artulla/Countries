@@ -15,12 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.graphql.country_api.core.ApiResult
 import com.graphql.country_api.presentation.ui.country.viewmodel.CountryDetailViewModel
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CountryDetailScreen(
     countryCode: String, viewModel: CountryDetailViewModel = hiltViewModel()

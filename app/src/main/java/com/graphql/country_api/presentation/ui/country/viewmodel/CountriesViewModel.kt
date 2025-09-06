@@ -1,6 +1,9 @@
 package com.graphql.country_api.presentation.ui.country.viewmodel
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.graphql.country_api.CountriesQuery
 import com.graphql.country_api.core.ApiResult
@@ -33,19 +36,13 @@ class CountriesViewModel @Inject constructor(
     private val countriesUseCase: CountriesUseCase
 ) : BaseViewModel() {
 
+    var showContinentDialog by mutableStateOf(true)
+
     private val _selectedContinentDialog = MutableStateFlow<Continent?>(null)
     val selectedContinentDialog: StateFlow<Continent?> = _selectedContinentDialog
 
-    fun setSelectedContinent(continent: Continent) {
-        _selectedContinentDialog.value = continent
-    }
-
     private val _searchCountry = MutableStateFlow("")
     val searchCountry: StateFlow<String> = _searchCountry
-
-    fun setSearchCountry(query: String) {
-        _searchCountry.value = query
-    }
 
     private val _countries = MutableStateFlow<ApiResult<MutableList<CountriesQuery.Country>>>(
         ApiResult.Loading
@@ -53,6 +50,18 @@ class CountriesViewModel @Inject constructor(
 
     /** Exposed StateFlow for observing the list of countries in UI.*/
     val countries: StateFlow<ApiResult<MutableList<CountriesQuery.Country>>> get() = _countries
+
+    fun closeDialog() {
+        showContinentDialog = false
+    }
+
+    fun setSelectedContinent(continent: Continent) {
+        _selectedContinentDialog.value = continent
+    }
+
+    fun setSearchCountry(query: String) {
+        _searchCountry.value = query
+    }
 
     fun fetchCountries(continentCode: String) {
         viewModelScope.launch {

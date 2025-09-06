@@ -1,6 +1,7 @@
 package com.graphql.country_api.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,6 +22,7 @@ import com.graphql.country_api.presentation.ui.country.viewmodel.CountryDetailVi
  *
  * Uses Hilt for injecting ViewModels.
  */
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CountryNavigation() {
     val navController = rememberNavController()

@@ -36,39 +36,41 @@ class CountriesUseCase @Inject constructor(
             // Step 1: Emit loading state
             emit(ApiResult.Loading)
 
-            // Step 2: Fetch all countries from repository (suspend function)
-            val countries = repository.fetchCountries()
+            // Step 2: Fetch all countries from repository
+            val countries =
+                repository.fetchCountries() // Assuming this returns List<CountriesQuery.Country>
 
             // Step 3: Filter countries by continent code
             val filteredCountries = countries.filter {
                 it.continent.code.equals(continentCode, ignoreCase = true)
-            }.toMutableList()
+            }
 
-            val mappedCountries = filteredCountries.map { con ->
+            // Map and insert into the database
+            val mappedCountries = filteredCountries.map { country ->
                 CountryEntity(
-                    continentName = con.continent.name,
-                    continentCode = con.continent.code,
-                    capital = con.capital,
-                    code = con.code,
-                    phone = con.phone,
-                    emoji = con.emoji,
-                    name = con.name
+                    continentName = country.continent.name,
+                    continentCode = country.continent.code,
+                    capital = country.capital,
+                    code = country.code,
+                    phone = country.phone,
+                    emoji = country.emoji,
+                    name = country.name
                 )
             }.toMutableList()
-            repository.insertCountries(mappedCountries)
+            repository.insertCountries(mappedCountries) // This is a suspend function
 
-            // Step 4: Emit success with filtered list
-            emit(ApiResult.Success(filteredCountries))
+            // Step 4: Emit success with filtered list, converting to MutableList
+            emit(ApiResult.Success(filteredCountries.toMutableList())) // <-- CORRECTED HERE
         }.catch { e ->
             // Step 5: Handle exceptions and emit error state
-            emit(ApiResult.Error(e.message ?: "Unknown error"))
+            println("Flow encountered an error: ${e.message}") // Log the error
+            emit(ApiResult.Error(e.message ?: "Unknown error occurred"))
         }.onCompletion { cause ->
-            // Step 6: Optional - handle flow completion
+            // Step 6: Optional - handle flow completion (for side-effects like logging)
             if (cause == null) {
                 println("Flow completed successfully ✅")
             } else {
-                println("Flow completed with error: ${cause.message}")
-                emit(ApiResult.Error(cause.message ?: "Unknown error"))
+                println("Flow completed with an upstream error (should have been caught by .catch): ${cause.message}")
             }
         }
 }

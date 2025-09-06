@@ -90,6 +90,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.hilt)
     implementation(libs.lifecycle.extensions)
+    implementation(libs.worker)
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.androidx.activity.compose)
@@ -114,4 +115,5 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.converter.gson)
+    implementation(libs.accompanist)
 }

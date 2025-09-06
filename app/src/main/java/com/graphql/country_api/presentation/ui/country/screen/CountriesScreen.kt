@@ -16,16 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,31 +32,37 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.graphql.country_api.CountriesQuery
 import com.graphql.country_api.core.ApiResult
+import com.graphql.country_api.presentation.base.compose_view.CommonToolbar
 import com.graphql.country_api.presentation.ui.country.viewmodel.CountriesViewModel
+import com.graphql.country_api.worker.MyNumberWorker
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CountriesScreen(
     navController: NavController, viewModel: CountriesViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    var showContinentDialog by remember { mutableStateOf(true) }
+    val showDialog = viewModel.showContinentDialog
     val selectedContinent by viewModel.selectedContinentDialog.collectAsState()
     val searchCountry by viewModel.searchCountry.collectAsState()
     val countriesState by viewModel.countries.collectAsStateWithLifecycle()  // Collect the countries list from StateFlow
 
-    if (showContinentDialog) {
-        ContinentDialog(onDismissRequest = { showContinentDialog = false }, onSelect = { selected ->
+    if (showDialog) {
+        ContinentDialog(onDismissRequest = { viewModel.closeDialog()}, onSelect = { selected ->
             viewModel.setSelectedContinent(selected)
-            showContinentDialog = false
+            viewModel.closeDialog()
         })
     }
 
@@ -88,34 +89,21 @@ fun CountriesScreen(
                 country.name.contains(searchCountry, ignoreCase = true)
             }
             println("Country Size: ${searchCountries.size}")
-            Spacer(modifier = Modifier.height(12.dp))
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                OutlinedTextField(
-                    value = searchCountry,
-                    onValueChange = { viewModel.setSearchCountry(it) },
-                    placeholder = { Text("Search by country") },
-                    shape = RoundedCornerShape(28.dp),
-                    maxLines = 1,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done
-                    ),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search country"
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                LazyColumn {
-                    items(searchCountries) { country ->
-                        CountryItem(context = context, navController, country = country)
+                Scaffold(
+                    topBar = {
+                        CommonToolbar(
+                            title = "Country",
+                            onSearchTextChanged = { viewModel.setSearchCountry(it) })
+                    }) { padding ->
+                    LazyColumn(contentPadding = padding) {
+                        items(searchCountries) { country ->
+                            CountryItem(context = context, navController, country = country)
+                        }
                     }
                 }
             }
@@ -153,7 +141,20 @@ fun CountryItem(
             if (context is Activity) {
 //                context.finish()
             }
+
             Toast.makeText(context, country.name, Toast.LENGTH_SHORT).show()
+            startPrintingNumbers(context)
+
+            /*  val constraints = Constraints.Builder()
+                  .setRequiredNetworkType(NetworkType.CONNECTED)
+                  .setRequiresCharging(true)
+                  .build()
+
+              val constrainedWork = OneTimeWorkRequestBuilder<SyncWorker>()
+                  .setConstraints(constraints)
+                  .build()
+  //            val workRequest = OneTimeWorkRequestBuilder<SyncWorker>().build()
+              WorkManager.getInstance(context).enqueue(constrainedWork)*/
         }), elevation = CardDefaults.cardElevation(8.dp), // Shadow effect
         shape = MaterialTheme.shapes.medium // Rounded corners
     ) {
@@ -197,4 +198,14 @@ fun CountryItem(
 //        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
         }
     }
+}
+
+fun startPrintingNumbers(context: Context) {
+    val data = Data.Builder().putInt("count", 1).build()
+
+    val work = OneTimeWorkRequestBuilder<MyNumberWorker>()
+        // no initial delay for first one (starts ASAP). If you want the first also after 1 minute, add setInitialDelay.
+        .setInputData(data).build()
+
+    WorkManager.getInstance(context).enqueue(work)
 }
